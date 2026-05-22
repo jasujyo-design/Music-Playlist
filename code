@@ -1,0 +1,150 @@
+#include <iostream>
+#include <string>
+using namespace std;
+class Song {
+public:
+    string title;
+    Song* next;
+    Song* prev;
+    Song(string name) {
+        title = name;
+        next = NULL;
+        prev = NULL;
+    }
+};
+class Playlist {
+private:
+    Song* head;
+    Song* tail;
+    Song* current;
+public:
+    Playlist() {
+        head = NULL;
+        tail = NULL;
+        current = NULL;
+    }
+    void addSong(string title) {
+        Song* newSong = new Song(title);
+        if(head == NULL) {
+            head = tail = current = newSong;
+        }
+        else {
+            tail->next = newSong;
+            newSong->prev = tail;
+            tail = newSong;
+        }
+        cout << "Song Added Successfully!\n";
+    }
+    void displayPlaylist() {
+        if(head == NULL) {
+            cout << "Playlist is Empty!\n";
+            return;
+        }
+        Song* temp = head;
+        cout << "\n===== PLAYLIST =====\n";
+        while(temp != NULL) {
+            cout << "- " << temp->title << endl;
+            temp = temp->next;
+        }
+    }
+    void playCurrentSong() {
+        if(current == NULL) {
+            cout << "No Song Available!\n";
+            return;
+        }
+        cout << "Now Playing: " << current->title << endl;
+    }
+    void nextSong() {
+        if(current == NULL || current->next == NULL) {
+            cout << "No Next Song!\n";
+            return;
+        }
+        current = current->next;
+        playCurrentSong();
+    }
+    void previousSong() {
+        if(current == NULL || current->prev == NULL) {
+            cout << "No Previous Song!\n";
+            return;
+        }
+        current = current->prev;
+        playCurrentSong();
+    }
+    void removeSong(string title) {
+        if(head == NULL) {
+            cout << "Playlist is Empty!\n";
+            return;
+        }
+        Song* temp = head;
+        while(temp != NULL && temp->title != title) {
+            temp = temp->next;
+        }
+        if(temp == NULL) {
+            cout << "Song Not Found!\n";
+            return;
+        }
+        if(temp == head)
+            head = head->next;
+        if(temp == tail)
+            tail = tail->prev;
+        if(temp->prev != NULL)
+            temp->prev->next = temp->next;
+        if(temp->next != NULL)
+            temp->next->prev = temp->prev;
+        if(current == temp)
+            current = head;
+        delete temp;
+        cout << "Song Removed Successfully!\n";
+    }
+    void menu() {
+        int choice;
+        string songName;
+        do {
+            cout << "\n===== MUSIC PLAYLIST MENU =====\n";
+            cout << "1. Add Song\n";
+            cout << "2. Remove Song\n";
+            cout << "3. Display Playlist\n";
+            cout << "4. Play Current Song\n";
+            cout << "5. Next Song\n";
+            cout << "6. Previous Song\n";
+            cout << "7. Exit\n";
+            cout << "Enter Your Choice: ";
+            cin >> choice;
+            cin.ignore();
+            switch(choice) {
+                case 1:
+                    cout << "Enter Song Name: ";
+                    getline(cin, songName);
+                    addSong(songName);
+                    break;
+                case 2:
+                    cout << "Enter Song Name to Remove: ";
+                    getline(cin, songName);
+                    removeSong(songName);
+                    break;
+                case 3:
+                    displayPlaylist();
+                    break;
+                case 4:
+                    playCurrentSong();
+                    break;
+                case 5:
+                    nextSong();
+                    break;
+                case 6:
+                    previousSong();
+                    break;
+                case 7:
+                    cout << "Exiting Playlist...\n";
+                    break;
+                default:
+                    cout << "Invalid Choice!\n";
+            }
+        } while(choice != 7);
+    }
+};
+int main() {
+    Playlist playlist;
+    playlist.menu();
+    return 0;
+}
